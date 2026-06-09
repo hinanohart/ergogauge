@@ -40,6 +40,10 @@ def test_scan_text_windowed_logic() -> None:
     assert vs.scan_text(negated) == [], f"false-positive on negated text: {vs.scan_text(negated)}"
     far = "We are not aware of prior art. " + ("padding text. " * 12) + "This is simply the best."
     assert vs.scan_text(far), "scan_text allowed hype far from the negation marker"
+    cross = "It is NOT a benchmark. This is the best tool ever built for audio."
+    assert vs.scan_text(cross), "hype in a different sentence than the negation must be caught"
+    same = "ergogauge makes no claim to be the best and does not outperform anything."
+    assert vs.scan_text(same) == [], "same-sentence negation must still be allowed"
 
 
 def test_verify_step_script_passes_nonstrict() -> None:

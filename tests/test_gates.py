@@ -70,16 +70,27 @@ def test_g9_over_random_vs_healthy_separated(fast_cfg) -> None:
     assert h_ci[1] < o_ci[0], f"no separation: HEALTHY {h_ci} vs OVER_RANDOM {o_ci}"
 
 
-def test_gap_misses_but_cheeger_catches_lock() -> None:
-    """The wedge: a near-reducible (LOCKED) chain can have a non-trivial gap, yet a low
-    Cheeger conductance. This is why the second axis is load-bearing."""
-    streams, _ = generate_corpus("LOCKED", seed=1000, **EASY)
-    m = build_transition_model(streams)
-    g = spectral_gap(m.P, m.eigvals)
-    ch = cheeger(m.P, m.pi)
-    assert ch.conductance_phi < 0.05  # Cheeger catches the bottleneck
-    # gap alone is far less discriminative than the conductance here
-    assert ch.conductance_phi < g or g < 0.15
+def test_cheeger_distinguishes_lock_from_loop() -> None:
+    """The second axis is load-bearing: a near-reducible LOCKED chain and a slow REPETITIVE
+    loop BOTH depress the spectral gap, so the gap alone cannot separate them. The Cheeger
+    conductance phi does -- the loop is well-connected (large phi) while the lock has a
+    genuine bottleneck cut (small phi). This is the real mechanism (not a 'gap-high /
+    phi-low' wedge, which Cheeger's inequality forbids for the reversible symmetrized graph)."""
+    lock, _ = generate_corpus("LOCKED", seed=1000, delta=1e-3, **EASY)
+    loop, _ = generate_corpus("REPETITIVE", seed=1000, rho=0.97, **EASY)
+    ml, mr = build_transition_model(lock), build_transition_model(loop)
+    gap_lock = spectral_gap(ml.P, ml.eigvals)
+    gap_loop = spectral_gap(mr.P, mr.eigvals)
+    phi_lock = cheeger(ml.P, ml.pi).conductance_phi
+    phi_loop = cheeger(mr.P, mr.pi).conductance_phi
+    # both pathologies have a small spectral gap -> gap cannot tell them apart
+    assert gap_lock < 0.15 and gap_loop < 0.15, f"expected both small-gap: {gap_lock}, {gap_loop}"
+    # phi separates them: bottleneck (lock) vs well-connected cycle (loop)
+    assert phi_lock < 0.05, f"lock conductance not small: {phi_lock}"
+    assert phi_loop > 0.20, f"loop conductance not large: {phi_loop}"
+    assert phi_loop > 10 * phi_lock, (
+        f"phi fails to separate loop from lock: {phi_loop} vs {phi_lock}"
+    )
 
 
 def test_kemeny_crosscheck_finite_for_well_mixing() -> None:

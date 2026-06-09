@@ -6,7 +6,7 @@ The core library is torch-free (numpy only). The optional real-token demo lives 
 
 from __future__ import annotations
 
-__version__ = "0.1.0a1"
+__version__ = "0.1.0a2"
 
 from .api import DISCLAIMER, certify, certify_corpus
 from .certificate import Certificate

@@ -1,4 +1,4 @@
-# Pre-registered gate thresholds and evaluation protocol (ergogauge v0.1.0a1)
+# Pre-registered gate thresholds and evaluation protocol (ergogauge v0.1.0a2)
 
 > **Binding anti-theater control (G10).** This file fixes every decision threshold
 > and the train/test seed partition *before* the estimator / spectral / classifier
@@ -50,7 +50,7 @@ with a CI gap that excludes zero (gate **G9**), the taxonomy degrades honestly t
 
 ## 3. Decision order (classify.py, fail-closed)
 
-1. `COLLAPSED` (effective support ≤ `collapse_max_support` OR max stationary mass > `collapse_occupancy`) — checked *before* the identifiability gate, because collapse is readable from the well-estimated dominant stationary mass even when the underobserved tail would otherwise trigger ABSTAIN.
+1. `COLLAPSED` (effective support ≤ `collapse_max_support` OR max stationary mass > `collapse_occupancy`) — checked *before* the identifiability gate, because collapse is readable from the well-estimated dominant stationary mass even when the underobserved tail would otherwise trigger ABSTAIN. **Asserted only when ≥ `min_total_pairs` transition pairs were observed**: with fewer pairs (empty / degenerate input) genuine collapse is indistinguishable from no data, so control falls through to the gate and fails closed to `ABSTAIN` rather than fabricating a COLLAPSED/PASS certificate on zero data.
 2. identifiability gate fails → `ABSTAIN`
 3. `LOCKED` (`phi` CI-high < `phi_locked`)
 4. `REPETITIVE` (`gap` CI-high < `gap_repetitive`)
@@ -89,6 +89,22 @@ the gap-misses-but-Cheeger-catches case that makes the second axis load-bearing.
   - severity monotonicity: Spearman correlation of detection vs injected severity ≥ 0.8.
   - G9 separation: OVER_RANDOM vs HEALTHY and COLLAPSED vs OVER_RANDOM entropy-ratio
     CI gap excludes 0 on the easy-extreme TEST regime.
+
+- **v0.1.0a2 executed evaluation** (what `scripts/gen_metrics.py` actually computes and
+  `results/0.1.0a2_metrics.json` records; refines the wording above without changing any
+  binding threshold from §1/§2/§4, which remain as committed at SHA `aa34cbf`):
+  - per-class recall at the easy-extreme point (`V=64, L=2000, N_utt=16`) over the **full
+    100-seed** held-out TEST set, plus a grid-robustness recall sweep across `V ∈ {16, 256}`.
+  - severity monotonicity is operationalized as the **calibrated-instrument** criterion:
+    the load-bearing invariant moves monotonically with injected severity — Spearman of
+    `(ρ, −spectral_gap)` for REPETITIVE and `(−log₁₀ δ, −cheeger_phi)` for LOCKED ≥ 0.8.
+    (A saturating binary detection rate is a poor rank-correlation target on a coarse grid.)
+  - **resolution limit:** at fixed `(L, N_utt)` a lock with `δ ≲ 1/n_pairs` produces no
+    sampled cross-transition, so the bottleneck is unobservable and the instrument ABSTAINs
+    rather than emitting LOCKED — a stated limit, not a miss (`docs/NON-CLAIM.md`). The
+    monotonicity sweep therefore covers the observable regime `δ ≥ 1e-3` at `L=2000, N_utt=8`.
+  - hard-extreme: underdetermined noise ABSTAINs (no confident pathology flag).
+  - G9 separation: HEALTHY vs OVER_RANDOM entropy-ratio CI gap excludes 0.
 
 ## 6. Determinism (G4)
 

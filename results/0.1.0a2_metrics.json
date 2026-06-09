@@ -1,0 +1,154 @@
+{
+  "confusion_matrix": {
+    "COLLAPSED": {
+      "ABSTAIN": 0,
+      "COLLAPSED": 100,
+      "HEALTHY": 0,
+      "LOCKED": 0,
+      "OVER_RANDOM": 0,
+      "REPETITIVE": 0
+    },
+    "HEALTHY": {
+      "ABSTAIN": 0,
+      "COLLAPSED": 0,
+      "HEALTHY": 100,
+      "LOCKED": 0,
+      "OVER_RANDOM": 0,
+      "REPETITIVE": 0
+    },
+    "LOCKED": {
+      "ABSTAIN": 0,
+      "COLLAPSED": 0,
+      "HEALTHY": 0,
+      "LOCKED": 100,
+      "OVER_RANDOM": 0,
+      "REPETITIVE": 0
+    },
+    "OVER_RANDOM": {
+      "ABSTAIN": 0,
+      "COLLAPSED": 0,
+      "HEALTHY": 0,
+      "LOCKED": 0,
+      "OVER_RANDOM": 100,
+      "REPETITIVE": 0
+    },
+    "REPETITIVE": {
+      "ABSTAIN": 0,
+      "COLLAPSED": 0,
+      "HEALTHY": 0,
+      "LOCKED": 0,
+      "OVER_RANDOM": 0,
+      "REPETITIVE": 100
+    }
+  },
+  "disclaimer": "Primary correctness is synthetic (injected==detected, held-out TEST seeds). Mapping is a calibrated heuristic, not a theorem.",
+  "env": {
+    "ci_method": "stationary-block-bootstrap",
+    "numpy": "2.4.6",
+    "os": "Linux",
+    "python": "3.12.3",
+    "seed": 0
+  },
+  "g9_separation": {
+    "gap": 0.1763,
+    "gap_excludes_zero": true,
+    "healthy_ratio_ci_mean": [
+      0.7004,
+      0.7816
+    ],
+    "over_random_ratio_ci_mean": [
+      0.9579,
+      0.976
+    ]
+  },
+  "grid": {
+    "L": 2000,
+    "V": 64,
+    "bootstrap_reps": 30,
+    "n_test_seeds": 100,
+    "n_utt": 16,
+    "test_seeds": [
+      1000,
+      1099
+    ]
+  },
+  "grid_robustness_recall": {
+    "V16_L2000_Nutt8": {
+      "COLLAPSED": 1.0,
+      "HEALTHY": 0.0,
+      "LOCKED": 1.0,
+      "OVER_RANDOM": 1.0,
+      "REPETITIVE": 1.0
+    },
+    "V256_L2000_Nutt8": {
+      "COLLAPSED": 1.0,
+      "HEALTHY": 1.0,
+      "LOCKED": 1.0,
+      "OVER_RANDOM": 0.0,
+      "REPETITIVE": 0.0
+    }
+  },
+  "hard_extreme": {
+    "abstain_rate": 1.0,
+    "confident_pathology_rate": 0.0
+  },
+  "healthy_false_flag_rate": 0.0,
+  "macro_recall": 1.0,
+  "mode": "synthetic",
+  "order_sensitivity": {
+    "ergogauge_gap_auroc": 1.0,
+    "note": "structural sanity check (order-sensitivity), not a superiority claim",
+    "vendi_auroc": 0.5
+  },
+  "per_class_recall": {
+    "COLLAPSED": 1.0,
+    "HEALTHY": 1.0,
+    "LOCKED": 1.0,
+    "OVER_RANDOM": 1.0,
+    "REPETITIVE": 1.0
+  },
+  "regime": "easy-extreme",
+  "severity_monotonicity": {
+    "locked": {
+      "mean_cheeger_phi": [
+        0.1023,
+        0.0315,
+        0.0111,
+        0.0044,
+        0.0023
+      ],
+      "neg_log10_delta": [
+        1.0,
+        1.523,
+        2.0,
+        2.523,
+        3.0
+      ],
+      "observable_regime_note": "delta>=1e-3 at L=2000,n_utt=8; tighter locks are below sample resolution and ABSTAIN (see docs/NON-CLAIM.md).",
+      "spearman_severity_vs_neg_phi": 1.0
+    },
+    "metric": "Spearman of the load-bearing invariant vs injected severity (point estimate)",
+    "repetitive": {
+      "mean_spectral_gap": [
+        0.5231,
+        0.3681,
+        0.2097,
+        0.1056,
+        0.0527,
+        0.0105
+      ],
+      "rho": [
+        0.5,
+        0.65,
+        0.8,
+        0.9,
+        0.95,
+        0.99
+      ],
+      "spearman_rho_vs_neg_gap": 1.0
+    }
+  },
+  "vendi_role": "complementary order-independent axis; not claimed to be beaten",
+  "vendi_wedge": false,
+  "version": "0.1.0a2"
+}

@@ -34,16 +34,32 @@ DENYLIST = [
     "最高性能",
 ]
 
-# A denylist word is *allowed* when its surrounding context (a window of +/- WINDOW chars
-# in the full text, so it survives line wrapping) is an explicit negation / NON-CLAIM /
-# denylist-registry context. The negative-fixture test guarantees these patterns still fire
-# on planted hype (which carries no negation context), so this is not a dead grep.
+# A denylist word is *allowed* only when an explicit negation / NON-CLAIM / denylist-registry
+# marker sits (a) within +/- WINDOW chars (so it survives line wrapping) AND (b) in the SAME
+# sentence -- i.e. no sentence terminator (. ! ?) separates the negation from the hit. The
+# same-sentence rule is what stops a wide window from silently excusing hype that merely sits
+# near an unrelated negation in a *different* sentence (e.g. "It is NOT a benchmark. This is
+# the best tool."). The negative-fixture test guarantees the patterns still fire on planted
+# hype, so this is not a dead grep.
 WINDOW = 90
 NEGATION = re.compile(
     r"no claim|\bnot\b|n't|\bdenylist\b|without|neither|do(?:es)? not|cannot|"
     r"\brepair\b|aware of|makes no|fixes/solves|\bequivalents\b",
     re.IGNORECASE,
 )
+SENT_END = re.compile(r"[.!?]")
+
+
+def _same_sentence(text: str, a0: int, a1: int, b0: int, b1: int) -> bool:
+    """True if no sentence terminator lies strictly between spans [a0,a1) and [b0,b1)."""
+    if a1 <= b0:
+        gap = text[a1:b0]
+    elif b1 <= a0:
+        gap = text[b1:a0]
+    else:
+        return True  # overlapping spans -> same sentence
+    return SENT_END.search(gap) is None
+
 
 # Files to scan for marketing claims.
 SCAN_GLOBS = ["README.md", "docs/*.md"]
@@ -73,9 +89,10 @@ def scan_text(text: str) -> list[tuple[int, str]]:
     """Return [(line, snippet)] for every denylist word used as a positive claim.
 
     A hit is *allowed* (skipped) only when a negation marker sits within +/- WINDOW chars
-    of it in the full text (so a negation split across a wrapped line still suppresses the
-    false positive). This is a pure function so tests can exercise the windowed logic
-    directly on planted strings, not just the regex patterns.
+    AND in the same sentence (no sentence terminator between them). The window survives line
+    wrapping; the same-sentence rule stops the window from excusing hype that merely sits near
+    an unrelated negation in a different sentence. Pure function so tests can exercise the
+    logic directly on planted strings, not just the regex patterns.
     """
     hits: list[tuple[int, str]] = []
     pats = [re.compile(p, re.IGNORECASE) for p in DENYLIST]
@@ -83,8 +100,12 @@ def scan_text(text: str) -> list[tuple[int, str]]:
         for mobj in pat.finditer(text):
             lo = max(0, mobj.start() - WINDOW)
             hi = min(len(text), mobj.end() + WINDOW)
-            if NEGATION.search(text[lo:hi]):
-                continue  # negated / denylist-registry context -> allowed
+            allowed = any(
+                _same_sentence(text, mobj.start(), mobj.end(), lo + neg.start(), lo + neg.end())
+                for neg in NEGATION.finditer(text[lo:hi])
+            )
+            if allowed:
+                continue  # negation in the same sentence -> non-claim / registry context
             ln = _line_of(text, mobj.start())
             snippet = text[mobj.start() : mobj.start() + 80].splitlines()[0]
             hits.append((ln, snippet))

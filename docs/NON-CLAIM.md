@@ -27,8 +27,8 @@ These are stated verbatim and grep-enforced in CI. ergogauge is deliberately sco
    computed from the empirical token-transition operator. We are not aware of a shipped
    tool that produces this on generated codec-LM token streams (see Related Work).
    We claim **no** invention of the Markov framework, the Kemeny constant, the Cheeger
-   inequality, or the spectral gap (cf. arXiv:2410.02724, 2012.14660, 2402.13512,
-   2501.01638 — all theory).
+   inequality, or the spectral gap (cf. arXiv:2410.02724, 2012.14660, 2402.13512 — all
+   theory).
 
 7. **Relation to Vendi Score:** ergogauge measures a temporal / transition axis; Vendi
    measures an order-independent set-diversity axis — they are complementary. The
@@ -50,3 +50,11 @@ These are stated verbatim and grep-enforced in CI. ergogauge is deliberately sco
     {permanent, complete, first, best, guaranteed, automatic, SOTA, solves, outperform,
     and Japanese equivalents} must grep to zero positive-claim hits in README and docs,
     verified by `scripts/verify_step.py` and a negative-fixture test.
+
+11. **Finite-sample resolution limit.** A bottleneck is only detectable if the sample
+    actually contains the rare cross-transition that defines it. At fixed `(L, N_utt)` a
+    near-reducible chain with cross-probability `δ ≲ 1/n_pairs` produces no observed
+    cross-transition, so the lock is **unobservable** from that sample and ergogauge
+    ABSTAINs (or, if one block dominates, flags COLLAPSED) rather than emitting LOCKED.
+    Severity-monotonicity claims hold within the observable regime; below it the correct
+    behavior is to fail closed, not to assert a flag.

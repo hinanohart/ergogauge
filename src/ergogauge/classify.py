@@ -49,11 +49,18 @@ def classify_level(
 
     max_occ = float(np.max(model.pi)) if model.pi.size else 1.0
     support = _effective_support(model.pi, thr.support_eps)
-    is_collapsed = support <= thr.collapse_max_support or max_occ > thr.collapse_occupancy
+    # COLLAPSED is asserted *before* the identifiability gate, but only when enough
+    # transition pairs were observed to trust the dominant-mass story. With too few pairs
+    # (degenerate / empty input) we cannot distinguish genuine collapse from no data, so we
+    # do NOT fabricate a COLLAPSED flag: control falls through to the gate and fails closed
+    # to ABSTAIN. (Without this floor an empty stream estimates pi=[1.0] -> support 1 ->
+    # COLLAPSED/PASS, violating the fail-closed contract.)
+    has_enough_data = model.n_obs_pairs >= thr.min_total_pairs
+    is_collapsed = has_enough_data and (
+        support <= thr.collapse_max_support or max_occ > thr.collapse_occupancy
+    )
 
     if is_collapsed:
-        # Collapse is detectable from the (well-estimated) dominant stationary mass even
-        # when the identifiability gate would otherwise ABSTAIN on the underobserved tail.
         flags = ["COLLAPSED"]
         confidence = "high" if is_corpus else "low"
     elif not gate.passed:
@@ -155,6 +162,10 @@ def _decisive(flag: str, cis: dict[str, tuple[float, float]], thr: GateThreshold
 
 def aggregate_flags(level_results: list[dict[str, object]]) -> dict[str, object]:
     """Worst-level fail-closed aggregation across codebook levels."""
+    if not level_results:
+        # No analyzable level (empty corpus / no tokens). Never emit a green HEALTHY/PASS
+        # on zero data: fail closed to ABSTAIN.
+        return {"flags": ["ABSTAIN"], "status": "ABSTAIN", "confidence": "low"}
     severity = {
         "COLLAPSED": 4,
         "LOCKED": 3,

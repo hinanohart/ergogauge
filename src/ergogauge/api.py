@@ -106,16 +106,23 @@ def _analyze(
         level_results.append(block)
 
     # surface a representative gate (worst-case) at the top level
-    model0, _ = compute_point_metrics(levels_corpus[0], cfg) if levels_corpus else (None, {})
-    if model0 is not None:
-        g0 = run_identifiability_gate(
-            n_obs_pairs=model0.n_obs_pairs,
-            n_states_after_collapse=model0.n_states_after_collapse,
-            sparsity=model0.sparsity,
-            support_coverage=model0.support_coverage,
-            thr=cfg.gate,
-        )
-        gate_summary = g0.to_dict()
+    if not levels_corpus:
+        # Empty input: no level was analyzed. Fail closed rather than reporting a PASS gate.
+        gate_summary = {
+            "status": "ABSTAIN",
+            "reasons": ["no analyzable token levels (empty input)"],
+        }
+    else:
+        model0, _ = compute_point_metrics(levels_corpus[0], cfg)
+        if model0 is not None:
+            g0 = run_identifiability_gate(
+                n_obs_pairs=model0.n_obs_pairs,
+                n_states_after_collapse=model0.n_states_after_collapse,
+                sparsity=model0.sparsity,
+                support_coverage=model0.support_coverage,
+                thr=cfg.gate,
+            )
+            gate_summary = g0.to_dict()
 
     aggregate = aggregate_flags(level_results)
     meta = {

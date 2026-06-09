@@ -1,6 +1,6 @@
 # ROADMAP
 
-ergogauge v0.1.0a1 is a pre-alpha instrument with a deliberately narrow scope. The
+ergogauge v0.1.0a2 is a pre-alpha instrument with a deliberately narrow scope. The
 following are explicitly **out of scope for v0.1** and tracked here so the README makes
 no premature claims about them.
 
@@ -28,7 +28,7 @@ no premature claims about them.
   evidence and only an optional, clearly-labelled illustrative real-token demo
   (`examples/real_demo.py`, `[demo]` extra). A quantitative real-corpus study is future work.
 
-- **PyPI distribution.** Deferred to a later release; v0.1.0a1 is installed from source /
+- **PyPI distribution.** Deferred to a later release; v0.1.0a2 is installed from source /
   GitHub.
 
 ## Related work / orthogonal sibling
