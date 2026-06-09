@@ -18,6 +18,12 @@ no premature claims about them.
 - **Good–Turing / smoothing alternatives.** v0.1 uses Laplace add-α on the observed
   submatrix plus OTHER-collapse. Good–Turing and held-out smoothing are candidates.
 
+- **Sparse eigensolver for very large state counts.** v0.1 is dense-only; OTHER-collapse
+  caps the post-collapse state count and `max_states` is bounded to a dense-safe ceiling
+  (8192). A deterministic sparse (fixed-`v0` Lanczos/Arnoldi) path would lift that ceiling
+  for very large alphabets; it is not shipped in v0.1 (which is why scipy is not a runtime
+  dependency).
+
 - **Larger real-data study.** v0.1 ships synthetic ground-truth correctness as the primary
   evidence and only an optional, clearly-labelled illustrative real-token demo
   (`examples/real_demo.py`, `[demo]` extra). A quantitative real-corpus study is future work.

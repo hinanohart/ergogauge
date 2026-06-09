@@ -48,5 +48,5 @@ These are stated verbatim and grep-enforced in CI. ergogauge is deliberately sco
 10. **Downgrade rule (grep-enforced):** if a secondary comparative claim's bootstrap CI
     crosses zero, the headline auto-reverts to a neutral "instrument" framing. The denylist
     {permanent, complete, first, best, guaranteed, automatic, SOTA, solves, outperform,
-    and Japanese equivalents} must grep to zero hits in README/docs/code, verified by a
-    negative-fixture test.
+    and Japanese equivalents} must grep to zero positive-claim hits in README and docs,
+    verified by `scripts/verify_step.py` and a negative-fixture test.

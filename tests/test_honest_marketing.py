@@ -32,6 +32,16 @@ def test_denylist_is_live_negative_fixture() -> None:
         assert any(p.search(bad) for p in pats), f"denylist missed: {bad!r}"
 
 
+def test_scan_text_windowed_logic() -> None:
+    """Exercise scan_text directly: positive-claim hype is caught; negated context allowed."""
+    hype = "ergogauge is the best instrument and it outperforms every alternative tool."
+    assert vs.scan_text(hype), "scan_text failed to catch positive-claim hype"
+    negated = "ergogauge makes no claim to be the best and does not outperform anything."
+    assert vs.scan_text(negated) == [], f"false-positive on negated text: {vs.scan_text(negated)}"
+    far = "We are not aware of prior art. " + ("padding text. " * 12) + "This is simply the best."
+    assert vs.scan_text(far), "scan_text allowed hype far from the negation marker"
+
+
 def test_verify_step_script_passes_nonstrict() -> None:
     """The hygiene script itself exits 0 in non-strict mode (placeholders allowed pre-S7)."""
     r = subprocess.run(

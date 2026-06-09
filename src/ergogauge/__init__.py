@@ -1,7 +1,7 @@
 """ergogauge — reference-free ergodicity certificate for codec-LM token streams.
 
-The core library is torch-free (numpy + scipy only). The optional real-token demo
-lives in ``examples/`` behind the ``[demo]`` extra.
+The core library is torch-free (numpy only). The optional real-token demo lives in
+``examples/`` behind the ``[demo]`` extra.
 """
 
 from __future__ import annotations

@@ -50,8 +50,8 @@ with a CI gap that excludes zero (gate **G9**), the taxonomy degrades honestly t
 
 ## 3. Decision order (classify.py, fail-closed)
 
-1. identifiability gate fails → `ABSTAIN`
-2. `COLLAPSED` (effective support ≤ `collapse_max_support` OR max stationary mass > `collapse_occupancy`)
+1. `COLLAPSED` (effective support ≤ `collapse_max_support` OR max stationary mass > `collapse_occupancy`) — checked *before* the identifiability gate, because collapse is readable from the well-estimated dominant stationary mass even when the underobserved tail would otherwise trigger ABSTAIN.
+2. identifiability gate fails → `ABSTAIN`
 3. `LOCKED` (`phi` CI-high < `phi_locked`)
 4. `REPETITIVE` (`gap` CI-high < `gap_repetitive`)
 5. `OVER_RANDOM` (entropy ratio CI-low > `over_random_ratio`)
@@ -92,7 +92,10 @@ the gap-misses-but-Cheeger-catches case that makes the second axis load-bearing.
 
 ## 6. Determinism (G4)
 
-`N ≤ max_states`: dense `numpy.linalg.eig` (gap/Kemeny) and `numpy.linalg.eigh`
-(symmetric normalized Laplacian / Fiedler). Above the cap: `scipy.sparse.linalg.eigs`
-with a fixed start vector `v0` and pinned `tol`/`maxiter`. Certificates are required to
-be byte-identical on reruns and across Ubuntu and Windows.
+Dense `numpy.linalg.eig` (gap/Kemeny) and `numpy.linalg.eigh` (symmetric normalized
+Laplacian / Fiedler). OTHER-collapse caps the post-collapse state count at `max_states + 1`,
+and `max_states` is itself bounded to a dense-safe ceiling (`DENSE_STATE_CEILING = 8192`;
+larger values raise an error), so the dense decomposition is always applicable. A sparse
+Lanczos/Arnoldi path for very large state counts is ROADMAP and is not shipped in v0.1
+(hence scipy is not a runtime dependency). Certificates are required to be byte-identical
+on reruns and across Ubuntu and Windows.

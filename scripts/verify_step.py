@@ -38,10 +38,10 @@ DENYLIST = [
 # in the full text, so it survives line wrapping) is an explicit negation / NON-CLAIM /
 # denylist-registry context. The negative-fixture test guarantees these patterns still fire
 # on planted hype (which carries no negation context), so this is not a dead grep.
-WINDOW = 110
+WINDOW = 90
 NEGATION = re.compile(
-    r"no claim|not\b|n't|denylist|non-?claim|complementary|without|neither|"
-    r"do(?:es)? not|cannot|repair|aware of|makes no|fixes/solves|equivalents",
+    r"no claim|\bnot\b|n't|\bdenylist\b|without|neither|do(?:es)? not|cannot|"
+    r"\brepair\b|aware of|makes no|fixes/solves|\bequivalents\b",
     re.IGNORECASE,
 )
 
@@ -69,26 +69,34 @@ def _line_of(text: str, pos: int) -> int:
     return text.count("\n", 0, pos) + 1
 
 
-def check_denylist() -> bool:
-    """Flag hype words used as positive claims; allow explicitly-negated context.
+def scan_text(text: str) -> list[tuple[int, str]]:
+    """Return [(line, snippet)] for every denylist word used as a positive claim.
 
-    Context is judged on a +/- WINDOW char window of the *full text* (not per line), so a
-    negation marker split across a wrapped line still suppresses the false positive.
+    A hit is *allowed* (skipped) only when a negation marker sits within +/- WINDOW chars
+    of it in the full text (so a negation split across a wrapped line still suppresses the
+    false positive). This is a pure function so tests can exercise the windowed logic
+    directly on planted strings, not just the regex patterns.
     """
-    ok = True
+    hits: list[tuple[int, str]] = []
     pats = [re.compile(p, re.IGNORECASE) for p in DENYLIST]
+    for pat in pats:
+        for mobj in pat.finditer(text):
+            lo = max(0, mobj.start() - WINDOW)
+            hi = min(len(text), mobj.end() + WINDOW)
+            if NEGATION.search(text[lo:hi]):
+                continue  # negated / denylist-registry context -> allowed
+            ln = _line_of(text, mobj.start())
+            snippet = text[mobj.start() : mobj.start() + 80].splitlines()[0]
+            hits.append((ln, snippet))
+    return hits
+
+
+def check_denylist() -> bool:
+    ok = True
     for f in _scan_files():
-        text = f.read_text(encoding="utf-8")
-        for pat in pats:
-            for mobj in pat.finditer(text):
-                lo = max(0, mobj.start() - WINDOW)
-                hi = min(len(text), mobj.end() + WINDOW)
-                if NEGATION.search(text[lo:hi]):
-                    continue  # negated / NON-CLAIM / registry context -> allowed
-                ln = _line_of(text, mobj.start())
-                snippet = text[mobj.start() : mobj.start() + 80].splitlines()[0]
-                print(f"DENYLIST HIT: {f.relative_to(ROOT)}:{ln}: ...{snippet}")
-                ok = False
+        for ln, snippet in scan_text(f.read_text(encoding="utf-8")):
+            print(f"DENYLIST HIT: {f.relative_to(ROOT)}:{ln}: ...{snippet}")
+            ok = False
     return ok
 
 

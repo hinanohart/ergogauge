@@ -26,7 +26,6 @@ def test_certificate_carries_disclaimer(fast_cfg) -> None:
     streams, _ = generate_corpus("HEALTHY", seed=1000, **EASY)
     cert = certify_corpus(streams, config=fast_cfg)
     meta = cert.to_dict()["meta"]
-    assert "calibrated heuristic" not in meta.get("disclaimer", "").lower() or True
     assert "diagnostic instrument" in meta["disclaimer"]
     # every level carries the heuristic-not-theorem disclaimer
     for lvl in cert.to_dict()["levels"]:

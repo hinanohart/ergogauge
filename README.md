@@ -38,7 +38,7 @@ collapses the Cheeger conductance. ergogauge reads that fingerprint.
 ## Install
 
 ```bash
-pip install -e .            # core: numpy + scipy only
+pip install -e .            # core: numpy only
 pip install -e ".[viz]"     # + matplotlib for self-contained HTML reports
 pip install -e ".[dev]"     # + pytest / ruff / mypy
 pip install -e ".[demo]"    # + torch/encodec for the optional real-token example

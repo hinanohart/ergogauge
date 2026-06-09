@@ -1,9 +1,11 @@
 """Spectral invariants of the empirical token-transition operator.
 
-All point computations use the deterministic dense path: the estimator caps the state
-count at ``max_states + 1``, so ``numpy.linalg.eig`` / ``eigh`` are always applicable
-(see docs/CLAIM.md section 6). A fixed-``v0`` sparse fallback is provided for completeness
-but is not reached under the default collapse cap.
+All computations use the deterministic dense path (``numpy.linalg.eig`` / ``eigh``). The
+estimator's OTHER-collapse caps the state count at ``max_states + 1``, and ``max_states``
+is itself bounded to a dense-safe ceiling by :class:`ergogauge.config.ErgogaugeConfig`, so
+the dense decomposition is always applicable and byte-reproducible (docs/CLAIM.md section
+6). A sparse (Lanczos/Arnoldi) solver for very large state counts is ROADMAP; v0.1 does not
+ship one, which is why scipy is not a runtime dependency.
 """
 
 from __future__ import annotations

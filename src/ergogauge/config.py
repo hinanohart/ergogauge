@@ -6,6 +6,11 @@ from dataclasses import dataclass, field
 
 from .gate import GateThresholds
 
+# Largest post-collapse state count for which the deterministic dense eigensolver is
+# practical. Above this a sparse Lanczos/Arnoldi path would be needed (ROADMAP); v0.1
+# refuses rather than silently attempting an intractable dense decomposition.
+DENSE_STATE_CEILING = 8192
+
 
 @dataclass
 class ErgogaugeConfig:
@@ -37,3 +42,9 @@ class ErgogaugeConfig:
             raise ValueError(f"unknown rvq_mode={self.rvq_mode!r}")
         if self.smoothing not in ("laplace",):
             raise ValueError(f"unknown smoothing={self.smoothing!r}")
+        if self.max_states > DENSE_STATE_CEILING:
+            raise ValueError(
+                f"max_states={self.max_states} exceeds the dense-eigensolver ceiling "
+                f"{DENSE_STATE_CEILING}; a sparse solver for larger state counts is ROADMAP. "
+                "Lower max_states (OTHER-collapse will still represent the rare tail)."
+            )

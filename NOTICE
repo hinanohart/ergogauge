@@ -6,7 +6,6 @@ This product depends on third-party software:
 
 Core (runtime):
   - NumPy        BSD 3-Clause License   https://numpy.org
-  - SciPy        BSD 3-Clause License   https://scipy.org
 
 Optional [viz] extra:
   - Matplotlib   Matplotlib License (BSD-compatible, PSF-derived)   https://matplotlib.org

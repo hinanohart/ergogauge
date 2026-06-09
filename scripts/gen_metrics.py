@@ -104,7 +104,6 @@ def main() -> int:
             "os": platform.system(),
             "python": platform.python_version(),
             "numpy": np.__version__,
-            "scipy": __import__("scipy").__version__,
             "seed": CFG.seed,
             "ci_method": "stationary-block-bootstrap",
         },

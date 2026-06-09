@@ -21,6 +21,11 @@ def test_unknown_rvq_mode_raises() -> None:
         ErgogaugeConfig(rvq_mode="bogus")
 
 
+def test_max_states_over_dense_ceiling_raises() -> None:
+    with pytest.raises(ValueError, match="dense"):
+        ErgogaugeConfig(max_states=20000)
+
+
 def test_certify_list_of_ints_returns_certificate(fast_cfg) -> None:
     cert = certify([0, 1, 2, 3] * 50, config=fast_cfg)
     assert isinstance(cert, Certificate)
