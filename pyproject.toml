@@ -1,0 +1,77 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ergogauge"
+version = "0.1.0a1"
+description = "CPU-only, reference-free, decode-free ergodicity certificate for generated codec-LM token streams"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Hinano Hart" }]
+keywords = [
+    "codec-language-model", "audio-generation", "diagnostics", "markov-chain",
+    "spectral-gap", "kemeny-constant", "cheeger-conductance", "ergodicity",
+    "reference-free", "mode-collapse", "tts",
+]
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+    "Topic :: Multimedia :: Sound/Audio :: Analysis",
+]
+dependencies = [
+    "numpy>=1.24",
+    "scipy>=1.10",
+]
+
+[project.urls]
+Homepage = "https://github.com/hinanohart/ergogauge"
+Repository = "https://github.com/hinanohart/ergogauge"
+Issues = "https://github.com/hinanohart/ergogauge/issues"
+
+[project.optional-dependencies]
+viz = ["matplotlib>=3.6"]
+dev = ["pytest>=7.4", "ruff>=0.5", "mypy>=1.8"]
+demo = ["torch>=2.0", "encodec>=0.1.1"]
+
+[project.scripts]
+ergogauge = "ergogauge.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/ergogauge"]
+
+[tool.hatch.build.targets.sdist]
+include = ["src/ergogauge", "tests", "docs", "LICENSE", "NOTICE", "README.md"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W", "UP", "B", "C4", "SIM"]
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+files = ["src/ergogauge"]
+warn_unused_ignores = true
+disallow_untyped_defs = true
+no_implicit_optional = true
+
+[[tool.mypy.overrides]]
+module = ["scipy.*", "matplotlib.*"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

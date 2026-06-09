@@ -1,0 +1,45 @@
+# build / packaging
+build/
+dist/
+*.egg-info/
+__pycache__/
+*.py[cod]
+
+# venv
+.venv/
+venv/
+env/
+
+# secrets / keys (never commit)
+.env
+*.pem
+*.key
+*_token*
+*secret*
+*.credentials
+
+# large artifacts / token dumps (commit only small license-clean fixtures explicitly)
+*.npz
+!tests/data/*.npz
+!examples/data/*.npz
+
+# build-state (autonomous build bookkeeping — never published)
+.ergogauge-progress.json
+.ergogauge.lock
+
+# tooling
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# editor / OS
+.vscode/
+.idea/
+.DS_Store
+
+# generated reports (kept out of VCS; results/ json is committed explicitly when measured)
+*.html
+!docs/**/*.html
+out/

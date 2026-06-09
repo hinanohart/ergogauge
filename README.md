@@ -1,0 +1,111 @@
+# ergogauge
+
+[![CI](https://github.com/hinanohart/ergogauge/actions/workflows/ci.yml/badge.svg)](https://github.com/hinanohart/ergogauge/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+![Status: pre-alpha](https://img.shields.io/badge/status-pre--alpha-orange.svg)
+
+**A CPU-only, reference-free, decode-free ergodicity certificate for generated codec-LM token streams.**
+
+ergogauge treats the discrete RVQ token stream emitted by an autoregressive codec /
+speech / audio language model (e.g. CosyVoice, Spark-TTS, VALL-E-family, MusicGen,
+AudioGen, Qwen2.5-Omni Talker) as a finite-state Markov chain. From the **empirical
+token-transition operator** it reports an *ergodicity certificate* — spectral gap,
+Kemeny constant, and Cheeger / Fiedler near-reducibility — and flags failure modes
+(`REPETITIVE`, `LOCKED`, `COLLAPSED`, `OVER_RANDOM`, `HEALTHY`) directly from integer
+token IDs, with bootstrap confidence intervals and a fail-closed `ABSTAIN`.
+
+> **What it is / is not.** ergogauge is a CPU-only, reference-free, decode-free, LLM-free
+> diagnostic instrument that treats a generated codec-LM token stream as a finite-state
+> Markov chain and reports an ergodicity certificate (spectral gap, Kemeny constant,
+> Cheeger/Fiedler near-reducibility) from the empirical token-transition operator. It is
+> NOT a replacement for FAD/MMD/UTMOS (it is a complementary, reference-free, decode-free
+> axis), NOT an audio-quality benchmark, and makes NO claim about perceptual quality or
+> that it fixes/solves generation quality. The invariant->failure-mode mapping on
+> non-reversible chains is a CALIBRATED HEURISTIC, not a theorem; flags are reported with
+> bootstrap confidence intervals and fail-closed ABSTAIN below the pre-registered
+> identifiability threshold. Primary correctness is demonstrated on a synthetic
+> injected-pathology harness; any real codec-LM token demo is secondary and labelled
+> synthetic-vs-real.
+
+## Why
+
+Decode-free, reference-free monitoring of an autoregressive audio generator: you have the
+token stream but neither a reference set, an LLM judge, nor the time to vocode and run a
+perceptual metric. A degenerate generator leaves a fingerprint in the *transition
+structure* of its own tokens — loops collapse the spectral gap, sub-vocabulary lock
+collapses the Cheeger conductance. ergogauge reads that fingerprint.
+
+## Install
+
+```bash
+pip install -e .            # core: numpy + scipy only
+pip install -e ".[viz]"     # + matplotlib for self-contained HTML reports
+pip install -e ".[dev]"     # + pytest / ruff / mypy
+pip install -e ".[demo]"    # + torch/encodec for the optional real-token example
+```
+
+The core library and CI are **torch-free**; torch is confined to the optional `[demo]`
+extra (`examples/real_demo.py`).
+
+## Quickstart
+
+```python
+from ergogauge import certify, certify_corpus
+
+# single utterance (advisory / low-confidence by default)
+cert = certify([3, 7, 3, 7, 3, 7, 3, 7])      # a loop
+print(cert.aggregate["flags"])                 # -> ['REPETITIVE']
+
+# corpus (the confident path): list of per-utterance token lists
+cert = certify_corpus([u1, u2, u3, ...])
+print(cert.to_json())
+```
+
+CLI:
+
+```bash
+ergogauge certify tokens.json        # full certificate (JSON)
+ergogauge gap tokens.json            # spectral gap only
+ergogauge cheeger tokens.json        # Cheeger / Fiedler
+ergogauge vendi-compare tokens.json  # order-sensitivity sanity check vs in-repo Vendi
+ergogauge doctor tokens.json         # identifiability / ABSTAIN diagnosis
+ergogauge report tokens.json -o report.html   # self-contained HTML ([viz])
+```
+
+## What it measures
+
+<!--MEASURED@S6: results table generated from results/v0.1.0a1_metrics.json; no hand-written numbers above S6 -->
+
+| axis | quantity | failure mode | status |
+|---|---|---|---|
+| spectral gap `g = 1 - |λ₂(P)|` | mixing speed of the directed empirical chain | REPETITIVE / loop | load-bearing (calibrated heuristic) |
+| Cheeger / Fiedler `φ`, `λ₂(L_sym)` | near-reducibility of the symmetrized graph | LOCKED (sub-vocabulary / timbre lock) | load-bearing; only the φ↔λ₂(L_sym) bound is a theorem |
+| Kemeny constant `K` | exploration scalar | — | convenience scalar (overlaps gap; not localized) |
+| occupancy / transition-entropy ratio | structure vs uniform null | OVER_RANDOM vs HEALTHY | A4 discriminator |
+
+## Correctness (synthetic, primary)
+
+<!--MEASURED@S6: per-class recall / FPR / abstain-rate / Vendi head-to-head from results/v0.1.0a1_metrics.json -->
+
+## Relation to other tools
+
+- **Vendi Score** (arXiv:2210.02410) measures order-independent set diversity; ergogauge
+  measures a temporal/transition axis. Complementary. The in-repo Vendi re-implementation
+  is used as an order-sensitivity sanity check, not as a baseline to beat.
+- **koopgauge** (`hinanohart/koopgauge`) performs a Koopman/DMD spectral audit on
+  *continuous latent states*. ergogauge operates on a *stochastic transition operator over
+  discrete integer token IDs* — disjoint object, no shared modules.
+
+## Related work
+
+ergogauge claims no invention of the Markov framework, the Kemeny constant, the Cheeger
+inequality, or the spectral gap. Prior theory: arXiv:2410.02724 (LLMs as Markov Chains),
+2501.01638 (a non-ergodic framework for emergent capabilities), 2012.14660 / 2402.13512
+(repetition / distribution-collapse mechanisms), 2210.02410 (Vendi Score), 2409.19283
+(discrete representation inconsistency). To our knowledge none ships a reference-free
+CPU-only ergodicity certificate for generated codec-LM token streams.
+
+## License
+
+MIT — see [LICENSE](LICENSE) and [NOTICE](NOTICE). See [docs/CLAIM.md](docs/CLAIM.md) for
+pre-registered thresholds and [docs/NON-CLAIM.md](docs/NON-CLAIM.md) for scope.
