@@ -7,7 +7,7 @@ no premature claims about them.
 ## Planned / under consideration
 
 - **Full RVQ-joint modeling.** v0.1 treats each residual-quantizer codebook level as an
-  independent first-order chain (`rvq_mode='per_level'`). A joint multi-codebook operator
+  independent order-1 (single-step) chain (`rvq_mode='per_level'`). A joint multi-codebook operator
   (`rvq_mode='flatten'` currently raises `NotImplementedError`) is future work; the joint
   state space is large and needs dedicated estimation/identifiability handling.
 

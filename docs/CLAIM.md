@@ -38,8 +38,8 @@ Decisions use the 95% bootstrap CI bound shown, never the point estimate alone.
 | `collapse_max_support` | 2 | effective support (states with stationary mass > `support_eps`) ≤ this → **COLLAPSED** |
 | `collapse_occupancy` | 0.90 | max stationary mass > this → **COLLAPSED** |
 | `support_eps` | 1e-4 | stationary-mass threshold for counting a state as "effective support" |
-| `over_random_ratio` | 0.98 | entropy ratio (transition/marginal) CI-low > this → **OVER_RANDOM** (no measurable conditional structure) |
-| `healthy_struct_ratio` | 0.95 | entropy ratio CI-high < this → structurally distinguishable from iid-uniform (HEALTHY-eligible) |
+| `over_random_ratio` | 0.93 | entropy ratio (transition/marginal) CI-low > this → **OVER_RANDOM** (no measurable conditional structure) |
+| `healthy_struct_ratio` | 0.88 | entropy ratio CI-high < this → structurally distinguishable from iid-uniform (HEALTHY-eligible) |
 
 The `over_random_ratio` / `healthy_struct_ratio` pair is the A4 discriminator that
 separates OVER_RANDOM (transition entropy ≈ marginal entropy ≈ log V, no conditional

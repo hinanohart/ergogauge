@@ -2,13 +2,25 @@
 
 The core library is torch-free (numpy + scipy only). The optional real-token demo
 lives in ``examples/`` behind the ``[demo]`` extra.
-
-Public API is wired up incrementally during the build; ``__version__`` is always
-available so ``import ergogauge`` succeeds with only the core dependencies installed.
 """
 
 from __future__ import annotations
 
 __version__ = "0.1.0a1"
 
-__all__ = ["__version__"]
+from .api import DISCLAIMER, certify, certify_corpus
+from .certificate import Certificate
+from .config import ErgogaugeConfig
+from .estimator import TransitionModel
+from .gate import GateThresholds
+
+__all__ = [
+    "__version__",
+    "certify",
+    "certify_corpus",
+    "Certificate",
+    "ErgogaugeConfig",
+    "TransitionModel",
+    "GateThresholds",
+    "DISCLAIMER",
+]

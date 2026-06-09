@@ -1,0 +1,84 @@
+{
+  "abstain_rate_on_degenerate": 1.0,
+  "confusion_matrix": {
+    "COLLAPSED": {
+      "ABSTAIN": 0,
+      "COLLAPSED": 3,
+      "HEALTHY": 0,
+      "LOCKED": 0,
+      "OVER_RANDOM": 0,
+      "REPETITIVE": 0
+    },
+    "HEALTHY": {
+      "ABSTAIN": 0,
+      "COLLAPSED": 0,
+      "HEALTHY": 3,
+      "LOCKED": 0,
+      "OVER_RANDOM": 0,
+      "REPETITIVE": 0
+    },
+    "LOCKED": {
+      "ABSTAIN": 0,
+      "COLLAPSED": 0,
+      "HEALTHY": 0,
+      "LOCKED": 3,
+      "OVER_RANDOM": 0,
+      "REPETITIVE": 0
+    },
+    "OVER_RANDOM": {
+      "ABSTAIN": 0,
+      "COLLAPSED": 0,
+      "HEALTHY": 0,
+      "LOCKED": 0,
+      "OVER_RANDOM": 3,
+      "REPETITIVE": 0
+    },
+    "REPETITIVE": {
+      "ABSTAIN": 0,
+      "COLLAPSED": 0,
+      "HEALTHY": 0,
+      "LOCKED": 0,
+      "OVER_RANDOM": 0,
+      "REPETITIVE": 3
+    }
+  },
+  "disclaimer": "Primary correctness is synthetic (injected==detected, held-out TEST seeds). Mapping is a calibrated heuristic, not a theorem.",
+  "env": {
+    "ci_method": "stationary-block-bootstrap",
+    "numpy": "2.4.6",
+    "os": "Linux",
+    "python": "3.12.3",
+    "scipy": "1.17.1",
+    "seed": 0
+  },
+  "grid": {
+    "L": 2000,
+    "V": 64,
+    "bootstrap_reps": 60,
+    "n_utt": 16,
+    "test_seeds": [
+      1000,
+      1001,
+      1002
+    ]
+  },
+  "healthy_false_flag_rate": 0.0,
+  "macro_recall": 1.0,
+  "mode": "synthetic",
+  "order_sensitivity": {
+    "ergogauge_gap_auroc": 1.0,
+    "note": "structural sanity check (order-sensitivity), not a superiority claim",
+    "vendi_auroc": 0.5
+  },
+  "per_class_recall": {
+    "COLLAPSED": 1.0,
+    "HEALTHY": 1.0,
+    "LOCKED": 1.0,
+    "OVER_RANDOM": 1.0,
+    "REPETITIVE": 1.0
+  },
+  "regime": "easy-extreme",
+  "vendi_role": "complementary order-independent axis; not claimed to be beaten",
+  "vendi_wedge": false,
+  "version": "0.1.0a1"
+}

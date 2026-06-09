@@ -55,22 +55,18 @@ jobs:
         run: uv run python scripts/verify_step.py --strict
 
   honest-marketing:
-    name: honest-marketing (denylist grep)
+    name: honest-marketing (denylist, single source)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
-      - name: Denylist grep must be zero (ERE, real rc)
-        run: |
-          set +e
-          # Word-boundary ERE across shipped docs; 'first'/'best'/'SOTA'/'solves' etc.
-          pattern='\b(permanent|completely|first|best|guaranteed|automatically|SOTA|solves|outperforms?)\b|世界初|業界初|完全保証|最高性能'
-          hits=$(grep -rEniI "$pattern" README.md docs/ 2>/dev/null | grep -viE 'no claim|not a|claims? no|denylist|NON-CLAIM|we are not aware|makes no|not aware of' )
-          if [ -n "$hits" ]; then
-            echo "DENYLIST HIT:"; echo "$hits"; exit 1
-          fi
-          echo "denylist clean"
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Denylist + disclaimer gate (scripts/verify_step.py, stdlib only)
+        run: python scripts/verify_step.py --strict
 
   torch-free-core:
     name: core-import-is-torch-free
