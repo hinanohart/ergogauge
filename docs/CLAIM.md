@@ -1,13 +1,17 @@
 # Pre-registered gate thresholds and evaluation protocol (ergogauge v0.1.0a2)
 
-> **Binding anti-theater control (G10).** This file fixes every decision threshold
-> and the train/test seed partition *before* the estimator / spectral / classifier
-> code is written. The git commit that introduces this file is recorded in
+> **Binding anti-theater control (G10).** This file fixes the decision thresholds and the
+> train/test seed partition before the estimator / spectral / classifier code is written.
+> The git commit that introduces this file is recorded in
 > `.ergogauge-progress.json:preregistration.claim_md_sha`. A test
 > (`tests/test_preregistration.py`) asserts that `ergogauge.gate.GateThresholds`
 > equals the values below, and that the TRAIN and TEST synthetic seed sets are
 > disjoint. Thresholds are calibrated on the TRAIN seed grid only; the confusion
-> matrix is reported on the disjoint TEST seed grid.
+> matrix is reported on the disjoint TEST seed grid. **Provenance caveat:** the two A4
+> discriminator thresholds (§2 `over_random_ratio`, `healthy_struct_ratio`) were
+> deliberately calibrated on the TRAIN grid in S2 (from scaffold placeholders 0.98/0.95 to
+> 0.93/0.88) and finalized with the estimator — frozen before any TEST evaluation, but not
+> at the scaffold commit. See §7 for the exact provenance.
 >
 > These numbers are *calibrated heuristics* on the empirical token-transition
 > operator, **not theorems** (see `NON-CLAIM.md`). All scalars are reported with
@@ -92,7 +96,8 @@ the gap-misses-but-Cheeger-catches case that makes the second axis load-bearing.
 
 - **v0.1.0a2 executed evaluation** (what `scripts/gen_metrics.py` actually computes and
   `results/0.1.0a2_metrics.json` records; refines the wording above without changing any
-  binding threshold from §1/§2/§4, which remain as committed at SHA `aa34cbf`):
+  threshold value — see the threshold-provenance note in §7 for which thresholds were
+  frozen at `aa34cbf` vs TRAIN-calibrated at `7b6adc7`):
   - per-class recall at the easy-extreme point (`V=64, L=2000, N_utt=16`) over the **full
     100-seed** held-out TEST set, plus a grid-robustness recall sweep across `V ∈ {16, 256}`.
   - severity monotonicity is operationalized as the **calibrated-instrument** criterion:
@@ -115,3 +120,22 @@ larger values raise an error), so the dense decomposition is always applicable. 
 Lanczos/Arnoldi path for very large state counts is ROADMAP and is not shipped in v0.1
 (hence scipy is not a runtime dependency). Certificates are required to be byte-identical
 on reruns and across Ubuntu and Windows.
+
+## 7. Threshold provenance (honest)
+
+`tests/test_preregistration.py` enforces that `ergogauge.gate.GateThresholds` equals the
+values in §1/§2/§4 of *this* file; it does not by itself certify *when* each value was set.
+The honest git provenance is:
+
+| group | values | frozen at | calibrated on |
+|---|---|---|---|
+| §1 identifiability (`min_pairs_per_state`, `min_total_pairs`, `max_sparsity_frac`, `other_collapse_min_count`, `max_states`) | unchanged | scaffold `aa34cbf` (before estimator) | — (a-priori) |
+| §2 flag thresholds `gap_repetitive`, `phi_locked`, `collapse_max_support`, `collapse_occupancy`, `support_eps` | unchanged | scaffold `aa34cbf` (before estimator) | — (a-priori) |
+| §2 **A4 discriminator** `over_random_ratio`, `healthy_struct_ratio` | 0.98→**0.93**, 0.95→**0.88** | estimator commit `7b6adc7` (S2) | **TRAIN seeds 0–99 only** |
+| §4 calibration (`bootstrap_reps`, `block_mean_len`, `ci_level`, `alpha_nominal`, `corpus_min_utterances`) | unchanged | scaffold `aa34cbf` | — (a-priori) |
+
+The A4 pair is the only thresholds tuned after the scaffold. They were calibrated on the
+TRAIN grid (seeds 0–99) during S2 and committed with the estimator, i.e. **before any
+TEST-seed (1000–1099) evaluation** — so the no-TEST-tuning anti-theater guarantee holds —
+but they were *not* fixed at the `aa34cbf` scaffold. Treat `7b6adc7` as the freeze point for
+the A4 pair and `aa34cbf` for everything else. v0.1.0a2 changed no threshold value.

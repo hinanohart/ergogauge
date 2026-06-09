@@ -62,7 +62,7 @@ def _same_sentence(text: str, a0: int, a1: int, b0: int, b1: int) -> bool:
 
 
 # Files to scan for marketing claims.
-SCAN_GLOBS = ["README.md", "docs/*.md"]
+SCAN_GLOBS = ["README.md", "CHANGELOG.md", "docs/*.md"]
 
 # The mandatory verbatim disclaimer (a stable substring of it).
 DISCLAIMER_NEEDLE = (

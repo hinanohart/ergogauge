@@ -1,9 +1,17 @@
 # Changelog
 
 All notable changes to ergogauge are documented here. This project is pre-alpha;
-versions are `0.1.0aN` prereleases. The binding pre-registered thresholds
-(`docs/CLAIM.md` §1/§2/§4) are unchanged since the original pre-registration commit
-(SHA `aa34cbf`); changes below are bug fixes, added evaluation, and honesty refinements.
+versions are `0.1.0aN` prereleases.
+
+**Threshold provenance (precise).** The identifiability thresholds (§1), the
+gap/phi/collapse flag thresholds (§2), and the calibration constants (§4) were committed
+before the estimator at the pre-registration scaffold (SHA `aa34cbf`) and are unchanged
+since. The two **A4 discriminator** thresholds (`over_random_ratio` 0.98→0.93,
+`healthy_struct_ratio` 0.95→0.88) were **calibrated on the TRAIN seed grid (0–99, never
+TEST)** during S2 and finalized with the estimator (SHA `7b6adc7`) — so they were frozen
+before any TEST-seed evaluation, but were *not* fixed at the aa34cbf scaffold. **a2 changes
+no threshold value**; the changes below are bug fixes, added evaluation, and honesty
+refinements.
 
 ## 0.1.0a2
 
