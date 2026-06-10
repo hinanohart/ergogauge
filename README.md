@@ -16,17 +16,17 @@ ergogauge takes the integer token IDs emitted by an autoregressive audio/speech/
 
 ```mermaid
 flowchart TD
-    Input[Token stream\nlist of int IDs] --> Coerce[io.coerce_utterance\nper codebook level]
-    Coerce --> Estimator[estimator.TransitionModel\nbuild empirical P matrix]
-    Estimator --> Gate[gate.run_identifiability_gate\ncheck sufficient observations]
-    Estimator --> Spectral[spectral.spectral_gap\nspectral.cheeger\nspectral.kemeny]
+    Input[Token stream<br>list of int IDs] --> Coerce[io.coerce_utterance<br>per codebook level]
+    Coerce --> Estimator[estimator.TransitionModel<br>build empirical P matrix]
+    Estimator --> Gate[gate.run_identifiability_gate<br>check sufficient observations]
+    Estimator --> Spectral[spectral.spectral_gap<br>spectral.cheeger<br>spectral.kemeny]
     Estimator --> Entropy[entropy.entropy_discriminator]
-    Gate --> Classify[classify.classify_level\nflag per level]
+    Gate --> Classify[classify.classify_level<br>flag per level]
     Spectral --> Classify
     Entropy --> Classify
-    Classify --> Bootstrap[calibrate.bootstrap_cis\nconfidence intervals]
-    Bootstrap --> Certificate[certificate.Certificate\nJSON result]
-    Certificate --> CLI[CLI output\nor HTML report]
+    Classify --> Bootstrap[calibrate.bootstrap_cis<br>confidence intervals]
+    Bootstrap --> Certificate[certificate.Certificate<br>JSON result]
+    Certificate --> CLI[CLI output<br>or HTML report]
 ```
 
 ---
