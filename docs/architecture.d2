@@ -1,0 +1,49 @@
+direction: down
+explanation: |md
+  ### ergogauge
+  **CPU-only, reference-free ergodicity certificate for generated codec-LM token streams.**
+| {near: top-center}
+
+input: "① Token stream\nlist of int IDs" {shape: oval; style: {fill: "#6366f1"; font-color: "#ffffff"; stroke: "#4338ca"; bold: true; font-size: 18}}
+coerce: "② io.coerce_utterance\nper codebook level" {style: {fill: "#0ea5e9"; font-color: "#ffffff"; stroke: "#0369a1"; bold: true; font-size: 16}}
+estimator: "② estimator.TransitionModel\nbuild empirical P matrix" {style: {fill: "#0ea5e9"; font-color: "#ffffff"; stroke: "#0369a1"; bold: true; font-size: 16}}
+input -> coerce: "② coerce"
+coerce -> estimator: "② fit"
+
+analysis: "Spectral Analysis" {
+  style: {fill: "#f0fdf4"; stroke: "#10b981"; font-color: "#065f46"; bold: true; font-size: 16}
+  spectral: "③ spectral_gap\ncheeger  kemeny"
+  entropy: "③ entropy_discriminator"
+  bootstrap: "③ bootstrap_cis\nconfidence intervals"
+  *.style.fill: "#dcfce7"; *.style.font-color: "#065f46"
+}
+
+gate_zone: "Identifiability Gate" {
+  style: {fill: "#fffbeb"; stroke: "#f59e0b"; font-color: "#92400e"; bold: true; font-size: 16}
+  gate: "③ gate.run_identifiability_gate\ncheck sufficient observations"
+  classify: "④ classify.classify_level\nflag per level"
+  *.style.fill: "#fef3c7"; *.style.font-color: "#92400e"
+}
+
+estimator -> analysis.spectral: "③ analyze"
+estimator -> analysis.entropy: "③ measure"
+estimator -> analysis.bootstrap: "③ calibrate"
+estimator -> gate_zone.gate: "③ guard"
+
+analysis.spectral -> gate_zone.classify: "④ input"
+analysis.entropy -> gate_zone.classify: "④ input"
+analysis.bootstrap -> gate_zone.classify: "④ input"
+gate_zone.gate -> gate_zone.classify: "④ gate"
+
+certificate: "⑤ certificate.Certificate\nJSON result" {shape: cylinder; style: {fill: "#fdf2f8"; stroke: "#ec4899"; font-color: "#9d174e"; bold: true}}
+cli: "⑤ CLI output\nor HTML report" {shape: oval; style: {fill: "#fdf2f8"; stroke: "#ec4899"; font-color: "#9d174e"; bold: true}}
+
+gate_zone.classify -> certificate: "⑤ emit"
+certificate -> cli: "⑤ render"
+
+legend: "Legend" {
+  near: bottom-center
+  style: {fill: "#f8fafc"; stroke: "#cbd5e1"; font-size: 13}
+  e: "● entry"; c: "● core"; p: "● spectral"; b: "● gate"; d: "● output"
+  e.style.font-color: "#4338ca"; c.style.font-color: "#0369a1"; p.style.font-color: "#10b981"; b.style.font-color: "#f59e0b"; d.style.font-color: "#ec4899"
+}

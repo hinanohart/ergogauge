@@ -19,21 +19,9 @@ ergogauge takes the integer token IDs emitted by an autoregressive audio/speech/
 
 ## Architecture
 
-```mermaid
-flowchart TD
-    Input[Token stream<br>list of int IDs] --> Coerce[io.coerce_utterance<br>per codebook level]
-    Coerce --> Estimator[estimator.TransitionModel<br>build empirical P matrix]
-    Estimator --> Gate[gate.run_identifiability_gate<br>check sufficient observations]
-    Estimator --> Spectral[spectral.spectral_gap<br>spectral.cheeger<br>spectral.kemeny]
-    Estimator --> Entropy[entropy.entropy_discriminator]
-    Estimator --> Bootstrap[calibrate.bootstrap_cis<br>confidence intervals]
-    Gate --> Classify[classify.classify_level<br>flag per level]
-    Spectral --> Classify
-    Entropy --> Classify
-    Bootstrap --> Classify
-    Classify --> Certificate[certificate.Certificate<br>JSON result]
-    Certificate --> CLI[CLI output<br>or HTML report]
-```
+<div align="center">
+  <img src="docs/architecture.png" alt="ergogauge architecture" width="840">
+</div>
 
 ---
 
@@ -145,3 +133,4 @@ ergogauge claims no invention of the Markov framework, the Kemeny constant, the 
 ## License
 
 MIT — see [LICENSE](LICENSE) and [NOTICE](NOTICE). See [docs/CLAIM.md](docs/CLAIM.md) for pre-registered thresholds and [docs/NON-CLAIM.md](docs/NON-CLAIM.md) for scope.
+
