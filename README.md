@@ -21,11 +21,12 @@ flowchart TD
     Estimator --> Gate[gate.run_identifiability_gate<br>check sufficient observations]
     Estimator --> Spectral[spectral.spectral_gap<br>spectral.cheeger<br>spectral.kemeny]
     Estimator --> Entropy[entropy.entropy_discriminator]
+    Estimator --> Bootstrap[calibrate.bootstrap_cis<br>confidence intervals]
     Gate --> Classify[classify.classify_level<br>flag per level]
     Spectral --> Classify
     Entropy --> Classify
-    Classify --> Bootstrap[calibrate.bootstrap_cis<br>confidence intervals]
-    Bootstrap --> Certificate[certificate.Certificate<br>JSON result]
+    Bootstrap --> Classify
+    Classify --> Certificate[certificate.Certificate<br>JSON result]
     Certificate --> CLI[CLI output<br>or HTML report]
 ```
 
